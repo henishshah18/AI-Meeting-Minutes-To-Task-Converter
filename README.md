@@ -41,7 +41,7 @@ AI Meeting Minutes To Task Converter is a web application that leverages AI to e
 
 Below is a screenshot of the app in action, showing how meeting transcripts are converted into actionable tasks:
 
-![App Screenshot](attached_assets/image_1749808838053.png)
+![App Screenshot](attached_assets/image_1749808535128.png)
 
 ---
 
