@@ -50,7 +50,7 @@ export function registerRoutes(app: Express): Server {
         messages: [
           {
             role: "system",
-            content: "Extract tasks from meeting transcript. Return JSON array with objects containing: task_description, assignee, due_date (parse relative dates like 'tomorrow', 'tonight', 'Wednesday' to actual dates), priority (default P3 if not specified, can be P1, P2, P3, or P4)"
+            content: "Extract ALL actionable tasks from meeting transcript. Be thorough and don't miss any tasks. Return JSON array with objects containing: task_description, assignee, due_date (keep the EXACT original text from transcript like 'tomorrow at 5pm', 'Friday afternoon', 'by end of week'), priority (default P3 if not specified, can be P1, P2, P3, or P4). Look for all types of tasks including follow-ups, deliverables, action items, and commitments."
           },
           {
             role: "user",

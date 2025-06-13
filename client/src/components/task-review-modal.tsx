@@ -77,25 +77,14 @@ export function TaskReviewModal({
     approveTasksMutation.mutate(tasks);
   };
 
-  // Parse relative dates to actual dates
-  const formatDateForInput = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        // If it's a relative date like "tomorrow", "Friday", etc.
-        // For now, default to tomorrow
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(17, 0, 0, 0); // 5 PM
-        return tomorrow.toISOString().slice(0, 16);
-      }
-      return date.toISOString().slice(0, 16);
-    } catch {
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      tomorrow.setHours(17, 0, 0, 0);
-      return tomorrow.toISOString().slice(0, 16);
-    }
+  const addNewTask = () => {
+    const newTask: ExtractedTask = {
+      task_description: "",
+      assignee: "",
+      due_date: "",
+      priority: "P3"
+    };
+    setTasks([...tasks, newTask]);
   };
 
   return (
