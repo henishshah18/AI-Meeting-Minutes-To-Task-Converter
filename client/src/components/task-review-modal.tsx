@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -29,9 +29,9 @@ export function TaskReviewModal({
   const [tasks, setTasks] = useState<ExtractedTask[]>(extractedTasks);
 
   // Update tasks when extractedTasks prop changes
-  useState(() => {
+  useEffect(() => {
     setTasks(extractedTasks);
-  });
+  }, [extractedTasks]);
 
   const approveTasksMutation = useMutation({
     mutationFn: async (tasksToApprove: ExtractedTask[]) => {
