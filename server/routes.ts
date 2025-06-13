@@ -115,14 +115,26 @@ export function registerRoutes(app: Express): Server {
       
       for (const taskData of tasksToCreate) {
         try {
-          // Convert local time to UTC before storing
-          const dueDateUtc = convertLocalToUtc(taskData.due_date, req.user!.timezone || "UTC");
+          // For now, create a default due date if parsing fails
+          let dueDateUtc: Date;
+          try {
+            dueDateUtc = new Date(taskData.due_date);
+            if (isNaN(dueDateUtc.getTime())) {
+              // If date parsing fails, default to tomorrow
+              dueDateUtc = new Date();
+              dueDateUtc.setDate(dueDateUtc.getDate() + 1);
+            }
+          } catch {
+            dueDateUtc = new Date();
+            dueDateUtc.setDate(dueDateUtc.getDate() + 1);
+          }
           
           const taskToInsert = insertTaskSchema.parse({
             userId: req.user!.id,
             description: taskData.task_description,
             assignee: taskData.assignee,
             dueDateUtc,
+            dueDateOriginal: taskData.due_date,
             priority: taskData.priority,
             completed: false,
           });

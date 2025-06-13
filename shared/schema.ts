@@ -16,6 +16,7 @@ export const tasks = pgTable("tasks", {
   description: text("description").notNull(),
   assignee: text("assignee").notNull(),
   dueDateUtc: timestamp("due_date_utc").notNull(),
+  dueDateOriginal: text("due_date_original").notNull(),
   priority: text("priority").notNull().default("P3"),
   completed: boolean("completed").notNull().default(false),
   createdAt: timestamp("created_at").defaultNow(),

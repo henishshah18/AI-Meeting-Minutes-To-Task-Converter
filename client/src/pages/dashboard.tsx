@@ -131,6 +131,11 @@ export default function Dashboard() {
     logoutMutation.mutate();
   };
 
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setShowEditModal(true);
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -358,6 +363,7 @@ Example:
                                 <Button
                                   variant="ghost"
                                   size="sm"
+                                  onClick={() => handleEditTask(task)}
                                   className="text-gray-500 hover:text-blue-600"
                                 >
                                   <Edit2 className="h-4 w-4" />
@@ -395,6 +401,13 @@ Example:
           setTranscript("");
           queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
         }}
+      />
+
+      {/* Task Edit Modal */}
+      <TaskEditModal
+        open={showEditModal}
+        onOpenChange={setShowEditModal}
+        task={editingTask}
       />
     </div>
   );
