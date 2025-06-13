@@ -1,8 +1,8 @@
 import { users, tasks, type User, type InsertUser, type Task, type InsertTask, type UpdateTask } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import connectPg from "connect-pg-simple";
 import session from "express-session";
-import createMemoryStore from "memorystore";
-
-const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -18,92 +18,69 @@ export interface IStorage {
   sessionStore: any;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private tasks: Map<number, Task>;
-  private currentUserId: number;
-  private currentTaskId: number;
+export class DatabaseStorage implements IStorage {
   public sessionStore: any;
 
   constructor() {
-    this.users = new Map();
-    this.tasks = new Map();
-    this.currentUserId = 1;
-    this.currentTaskId = 1;
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
+    const pgStore = connectPg(session);
+    this.sessionStore = new pgStore({
+      conString: process.env.DATABASE_URL,
+      createTableIfMissing: true,
+      ttl: 7 * 24 * 60 * 60 * 1000, // 1 week
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = {
-      id,
-      username: insertUser.username,
-      password: insertUser.password,
-      timezone: insertUser.timezone || "UTC",
-      createdAt: new Date(),
-    };
-    this.users.set(id, user);
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
     return user;
   }
 
   async getTasksByUserId(userId: number): Promise<Task[]> {
-    return Array.from(this.tasks.values()).filter(
-      (task) => task.userId === userId,
-    );
+    return await db.select().from(tasks).where(eq(tasks.userId, userId));
   }
 
   async createTask(insertTask: InsertTask): Promise<Task> {
-    const id = this.currentTaskId++;
-    const task: Task = {
-      id,
-      userId: insertTask.userId,
-      description: insertTask.description,
-      assignee: insertTask.assignee,
-      dueDateUtc: insertTask.dueDateUtc,
-      dueDateOriginal: insertTask.dueDateOriginal,
-      priority: insertTask.priority || "P3",
-      completed: insertTask.completed || false,
-      createdAt: new Date(),
-    };
-    this.tasks.set(id, task);
+    const [task] = await db
+      .insert(tasks)
+      .values(insertTask)
+      .returning();
     return task;
   }
 
   async updateTask(id: number, userId: number, updates: UpdateTask): Promise<Task | undefined> {
-    const task = this.tasks.get(id);
-    if (!task || task.userId !== userId) {
-      return undefined;
+    const [task] = await db
+      .update(tasks)
+      .set(updates)
+      .where(eq(tasks.id, id))
+      .returning();
+    
+    if (task && task.userId === userId) {
+      return task;
     }
-    
-    const updatedTask: Task = {
-      ...task,
-      ...updates,
-    };
-    
-    this.tasks.set(id, updatedTask);
-    return updatedTask;
+    return undefined;
   }
 
   async deleteTask(id: number, userId: number): Promise<boolean> {
-    const task = this.tasks.get(id);
-    if (!task || task.userId !== userId) {
-      return false;
-    }
+    const result = await db
+      .delete(tasks)
+      .where(eq(tasks.id, id))
+      .returning();
     
-    return this.tasks.delete(id);
+    return result.length > 0 && result[0].userId === userId;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
