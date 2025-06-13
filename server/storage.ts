@@ -72,6 +72,7 @@ export class MemStorage implements IStorage {
       description: insertTask.description,
       assignee: insertTask.assignee,
       dueDateUtc: insertTask.dueDateUtc,
+      dueDateOriginal: insertTask.dueDateOriginal,
       priority: insertTask.priority || "P3",
       completed: insertTask.completed || false,
       createdAt: new Date(),

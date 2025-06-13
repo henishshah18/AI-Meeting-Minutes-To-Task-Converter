@@ -323,7 +323,7 @@ Example:
                             </TableCell>
                             <TableCell>
                               <span className="text-gray-700">
-                                {formatDate(task.dueDateUtc.toString())}
+                                {(task as any).dueDateOriginal || formatDate(task.dueDateUtc.toString())}
                               </span>
                             </TableCell>
                             <TableCell>

@@ -26,7 +26,7 @@ export function TaskEditModal({
   const [formData, setFormData] = useState({
     description: "",
     assignee: "",
-    dueDateLocal: "",
+    dueDateOriginal: "",
     priority: "P3" as "P1" | "P2" | "P3" | "P4",
   });
 
@@ -36,7 +36,7 @@ export function TaskEditModal({
       setFormData({
         description: task.description,
         assignee: task.assignee,
-        dueDateLocal: (task as any).dueDateLocal || "",
+        dueDateOriginal: (task as any).dueDateOriginal || "",
         priority: task.priority as "P1" | "P2" | "P3" | "P4",
       });
     }
@@ -78,6 +78,7 @@ export function TaskEditModal({
     updateTaskMutation.mutate({
       description: formData.description,
       assignee: formData.assignee,
+      dueDateOriginal: formData.dueDateOriginal,
       priority: formData.priority,
     });
   };
@@ -132,8 +133,8 @@ export function TaskEditModal({
               <Input
                 id="due-date"
                 type="text"
-                value={formData.dueDateLocal}
-                onChange={(e) => updateFormData("dueDateLocal", e.target.value)}
+                value={formData.dueDateOriginal}
+                onChange={(e) => updateFormData("dueDateOriginal", e.target.value)}
                 placeholder="e.g., Tomorrow at 5pm, Friday afternoon"
                 className="mt-2 rounded-lg"
               />
