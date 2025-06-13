@@ -252,12 +252,12 @@ Example:
                     </Badge>
                   </CardTitle>
                   
-                  <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                  <Select value={priorityFilter || "all"} onValueChange={(value) => setPriorityFilter(value === "all" ? "" : value)}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="All Priorities" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Priorities</SelectItem>
+                      <SelectItem value="all">All Priorities</SelectItem>
                       <SelectItem value="P1">P1 - Critical</SelectItem>
                       <SelectItem value="P2">P2 - High</SelectItem>
                       <SelectItem value="P3">P3 - Medium</SelectItem>

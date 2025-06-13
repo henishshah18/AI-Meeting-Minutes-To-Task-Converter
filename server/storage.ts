@@ -15,7 +15,7 @@ export interface IStorage {
   updateTask(id: number, userId: number, updates: UpdateTask): Promise<Task | undefined>;
   deleteTask(id: number, userId: number): Promise<boolean>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: any;
 }
 
 export class MemStorage implements IStorage {
@@ -23,7 +23,7 @@ export class MemStorage implements IStorage {
   private tasks: Map<number, Task>;
   private currentUserId: number;
   private currentTaskId: number;
-  public sessionStore: session.SessionStore;
+  public sessionStore: any;
 
   constructor() {
     this.users = new Map();
@@ -48,8 +48,10 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const user: User = {
-      ...insertUser,
       id,
+      username: insertUser.username,
+      password: insertUser.password,
+      timezone: insertUser.timezone || "UTC",
       createdAt: new Date(),
     };
     this.users.set(id, user);
@@ -65,8 +67,13 @@ export class MemStorage implements IStorage {
   async createTask(insertTask: InsertTask): Promise<Task> {
     const id = this.currentTaskId++;
     const task: Task = {
-      ...insertTask,
       id,
+      userId: insertTask.userId,
+      description: insertTask.description,
+      assignee: insertTask.assignee,
+      dueDateUtc: insertTask.dueDateUtc,
+      priority: insertTask.priority || "P3",
+      completed: insertTask.completed || false,
       createdAt: new Date(),
     };
     this.tasks.set(id, task);
