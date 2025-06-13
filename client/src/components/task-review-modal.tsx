@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type ExtractedTask } from "@shared/schema";
-import { Check, Trash2, X } from "lucide-react";
+import { Check, Trash2, X, Plus } from "lucide-react";
 
 interface TaskReviewModalProps {
   open: boolean;
@@ -139,9 +139,10 @@ export function TaskReviewModal({
                         </Label>
                         <Input
                           id={`due-date-${index}`}
-                          type="datetime-local"
-                          value={formatDateForInput(task.due_date)}
+                          type="text"
+                          value={task.due_date}
                           onChange={(e) => updateTask(index, "due_date", e.target.value)}
+                          placeholder="e.g., Tomorrow at 5pm, Friday afternoon"
                           className="mt-2 rounded-lg"
                         />
                       </div>
@@ -185,8 +186,19 @@ export function TaskReviewModal({
         </div>
 
         <div className="flex justify-between items-center pt-4 border-t bg-gray-50 -mx-6 -mb-6 px-6 py-4">
-          <div className="text-sm text-gray-600">
-            {tasks.length} task{tasks.length !== 1 ? "s" : ""} found
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-gray-600">
+              {tasks.length} task{tasks.length !== 1 ? "s" : ""} found
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={addNewTask}
+              className="rounded-lg"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Task
+            </Button>
           </div>
           
           <div className="flex space-x-3">
